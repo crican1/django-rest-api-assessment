@@ -1,0 +1,22 @@
+[
+  {
+    "model": "tunaapi.song",
+    "pk": "1",
+    "fields": {
+      "title": "Me Porto Bonito",
+      "artist_id": 1,
+      "album": "Un Verano Sin Ti",
+      "length": 158
+    }
+  },
+  {
+    "model": "tunaapi.song",
+    "pk": "2",
+    "fields": {
+    "title": "Cazadores",
+    "artist_id": 2,
+    "album": "Saturno",
+    "length": 226
+    }
+  }
+]

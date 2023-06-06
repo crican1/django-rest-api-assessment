@@ -1,0 +1,20 @@
+[
+  {
+    "model": "tunaapi.artist",
+    "pk": "1",
+    "fields": {
+      "name": "Bad Bunny",
+      "age": 29,
+      "bio": "Puerto-Rican rapper."
+    }
+  },
+  {
+    "model": "tunaapi.artist",
+    "pk": "2",
+    "fields": {
+      "name": "Rauw Alejandro",
+      "age": 30,
+      "bio": "Another Puerto-Rican rapper."
+    }
+  }
+]
