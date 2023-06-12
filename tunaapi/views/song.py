@@ -3,7 +3,7 @@ from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers, status
-from tunaapi.models import Artist, Song, Genre
+from tunaapi.models import Artist, Song, SongGenre
 
 
 class SongView(ViewSet):
@@ -39,18 +39,17 @@ class SongView(ViewSet):
         Returns
             Response -- JSON serialized event instance
         """
-        artist = Artist.objects.get(pk=request.data["userId"])
-        genre = Genre.objects.get(pk=request.data["description"])
+        artist_id = Artist.objects.get(pk=request.data["artist_id"])
 
         song = Song.objects.create(
             title=request.data["title"],
-            artist_id=artist,
+            artist_id=artist_id,
             album=request.data["album"],
             length=request.data["length"],
-            description=genre
+
         )
         serializer = SongSerializer(song)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk):
         """Handle PUT requests for a song
@@ -64,13 +63,11 @@ class SongView(ViewSet):
         song.album = request.data["album"]
         song.length = request.data["length"]
 
-        artist = Artist.objects.get(pk=request.data["userId"])
-        song.author_id = artist
-        genre = Genre.objects.get(pk=request.dat["description"])
-        song.description = genre
+        artist_id = Artist.objects.get(pk=request.data["artist_id"])
+        song.artist_id = artist_id
         song.save()
 
-        return Response(None, status=status.HTTP_204_NO_CONTENT)
+        return Response(None, status=status.HTTP_200_OK)
 
     def destroy(self, request, pk):
         """Handle DELETE requests for a song"""
@@ -78,9 +75,15 @@ class SongView(ViewSet):
         song.delete()
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
+class SongGenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SongGenre
+        fields = ( 'genre_id', )
+        depth = 1
+
 class SongSerializer(serializers.ModelSerializer):
     """JSON serializer for song"""
     class Meta:
         model = Song
-        fields = ('id', 'title', 'artist_id', 'album', 'length', 'description')
+        fields = ('id', 'title', 'artist_id', 'album', 'length')
         depth=1
