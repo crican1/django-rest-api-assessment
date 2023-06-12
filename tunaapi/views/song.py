@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from rest_framework import serializers, status
 from tunaapi.models import Artist, Song, SongGenre
 
-
 class SongView(ViewSet):
     """Tuna songss view"""
 
@@ -76,14 +75,16 @@ class SongView(ViewSet):
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
 class SongGenreSerializer(serializers.ModelSerializer):
+    """JSON serializer for Song Genre"""
     class Meta:
         model = SongGenre
-        fields = ( 'genre_id', )
-        depth = 1
+        fields = ('genre_id', )
+        depth = 2
 
 class SongSerializer(serializers.ModelSerializer):
     """JSON serializer for song"""
+    genre = SongGenreSerializer(many=True, read_only=True)
     class Meta:
         model = Song
-        fields = ('id', 'title', 'artist_id', 'album', 'length')
-        depth=1
+        fields = ('id', 'title', 'artist_id', 'album', 'length', 'genre')
+        depth = 1

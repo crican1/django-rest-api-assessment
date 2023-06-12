@@ -56,29 +56,17 @@ class GenreView(ViewSet):
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
 class SongGenreSerializer(serializers.ModelSerializer):
+    """JSON serializer for Song Genre"""
     class Meta:
         model = SongGenre
-        fields = ( 'song_id', )
+        fields = ('song_id', )
         depth = 1
-
-
-class SongsGenreSerializer(serializers.ModelSerializer):
-    """JSON serializer for event"""
-    song = SongGenreSerializer(many=True, read_only=True)
-    song_count = serializers.SerializerMethodField()
-    class Meta:
-        model = SongGenre
-        fields = ('id', 'description', 'song', 'song_count')
-        depth = 2
-
-    def get_song_count(self, obj):
-        """To get the song count for a song"""
-        return obj.song_count
 
 class GenreSerializer(serializers.ModelSerializer):
     """JSON serializer for event"""
+    song = SongGenreSerializer(many=True, read_only=True)
     class Meta:
         model = Genre
-        fields = ('id' ,'description')
-        depth=2
+        fields = ('id' ,'description', 'song')
+        depth = 0
     
