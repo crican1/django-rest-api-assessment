@@ -3,6 +3,7 @@ from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers, status
+from django.db.models import Count
 from tunaapi.models import Artist
 
 class ArtistView(ViewSet):
@@ -11,7 +12,7 @@ class ArtistView(ViewSet):
     def retrieve(self, request, pk):
         """Handle GET requests for single artist"""
         try:
-            artist = Artist.objects.get(pk=pk)
+            artist = Artist.objects.annotate(song_count=Count('song')).get(pk=pk)
             serializer = ArtistSerializer(artist)
             return Response(serializer.data)
         except Artist.DoesNotExist as ex:
@@ -19,7 +20,7 @@ class ArtistView(ViewSet):
 
     def list(self, request):
         """Handle GET requests to get all artists"""
-        artist = Artist.objects.all()
+        artist = Artist.objects.annotate(song_count=Count('song')).all()
 
         serializer = ArtistSerializer(artist, many=True)
         return Response(serializer.data)
@@ -63,7 +64,8 @@ class ArtistView(ViewSet):
 
 class ArtistSerializer(serializers.ModelSerializer):
     """JSON serializer for event"""
+    song_count = serializers.IntegerField(default=None)
     class Meta:
         model = Artist
-        fields = ('id', 'name', 'age', 'bio')
+        fields = ('id', 'name', 'age', 'bio', 'song_count', 'song')
         depth=1
