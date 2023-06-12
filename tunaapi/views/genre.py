@@ -2,7 +2,7 @@ from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers, status
-from tunaapi.models import Genre
+from tunaapi.models import Genre, SongGenre
 
 class GenreView(ViewSet):
     """Tuna genres view"""
@@ -34,7 +34,7 @@ class GenreView(ViewSet):
           description=request.data["description"]
         )
         serializer = GenreSerializer(genre)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk):
         """Handle PUT requests for a genre
@@ -47,7 +47,7 @@ class GenreView(ViewSet):
 
         genre.save()
 
-        return Response(None, status=status.HTTP_204_NO_CONTENT)
+        return Response(None, status=status.HTTP_200_OK)
 
     def destroy(self, request, pk):
         """Handle DELETE requests for a genre"""
@@ -55,10 +55,30 @@ class GenreView(ViewSet):
         genre.delete()
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
+class SongGenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SongGenre
+        fields = ( 'song_id', )
+        depth = 1
+
+
+class SongsGenreSerializer(serializers.ModelSerializer):
+    """JSON serializer for event"""
+    song = SongGenreSerializer(many=True, read_only=True)
+    song_count = serializers.SerializerMethodField()
+    class Meta:
+        model = SongGenre
+        fields = ('id', 'description', 'song', 'song_count')
+        depth = 2
+
+    def get_song_count(self, obj):
+        """To get the song count for a song"""
+        return obj.song_count
+
 class GenreSerializer(serializers.ModelSerializer):
     """JSON serializer for event"""
     class Meta:
         model = Genre
         fields = ('id' ,'description')
-        depth=1
+        depth=2
     
